@@ -15,7 +15,9 @@ resource "kubernetes_config_map_v1" "otel_collector_config" {
     "config.yaml" = yamlencode({
       receivers = {
         prometheus = {
+
           config = {
+
             scrape_configs = [
               {
                 job_name = "otel-frr-exporter"
