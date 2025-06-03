@@ -12,68 +12,7 @@ resource "kubernetes_config_map_v1" "otel_collector_config" {
     namespace = kubernetes_namespace.network.metadata[0].name
   }
   data = {
-    "config.yaml" = yamlencode({
-      receivers = {
-        prometheus = {
-
-          config = {
-
-            scrape_configs = [
-              {
-                job_name = "otel-frr-exporter"
-                static_configs = [
-                  {
-                    targets = [
-                      "192.168.0.100:9480"
-                    ]
-                  }
-                ]
-                metrics_path    = "/metrics"
-                scrape_interval = "15s"
-              },
-              {
-                job_name = "otel-node-exporter"
-                static_configs = [
-                  {
-                    targets = [
-                      "192.168.0.100:9481"
-                    ]
-                  }
-                ]
-                metrics_path    = "/metrics"
-                scrape_interval = "5s"
-              },
-              {
-                job_name = "blackbox-exporter"
-                static_configs = [
-                  {
-                    targets = [
-                      "192.168.0.100:9115"
-                    ]
-                  }
-                ]
-                metrics_path    = "/metrics"
-                scrape_interval = "5s"
-              }
-            ]
-          }
-        }
-      }
-      exporters = {
-        debug = {}
-        prometheus = {
-          endpoint = "0.0.0.0:8889"
-        }
-      }
-      service = {
-        pipelines = {
-          metrics = {
-            receivers = ["prometheus"]
-            exporters = ["debug", "prometheus"]
-          }
-        }
-      }
-    })
+    "config.yaml" = file("otel-collector-config.yaml")
   }
 }
 
