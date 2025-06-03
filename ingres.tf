@@ -4,7 +4,7 @@ resource "kubernetes_ingress_v1" "prometheus_ui" {
     name      = "prometheus-ui"
     namespace = kubernetes_namespace.network.metadata[0].name
     annotations = {
-      "kubernetes.io/ingress.class" = "nginx"
+      "kubernetes.io/ingress.class" = "public" # MikroK8s używa "public", a nie "nginx"!
       # Opcjonalne adnotacje:
       # "nginx.ingress.kubernetes.io/rewrite-target" = "/"
       # "cert-manager.io/cluster-issuer" = "letsencrypt-prod" # Jeśli używasz cert-managera
