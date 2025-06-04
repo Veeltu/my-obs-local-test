@@ -86,9 +86,9 @@ resource "kubernetes_deployment_v1" "otel_collector" {
         component = "otel-collector"
       }
     }
-    min_ready_seconds = 5
+    # min_ready_seconds = 5
     # progress_deadline_seconds = 120
-    replicas = 1
+    # replicas = 1
     template {
       metadata {
         labels = {
@@ -117,15 +117,15 @@ resource "kubernetes_deployment_v1" "otel_collector" {
           #   read_only  = true
           # }
 
-          resources {
-            limits = {
-              memory = "2Gi"
-            }
-            requests = {
-              cpu    = "200m"
-              memory = "400Mi"
-            }
-          }
+          # resources {
+          #   limits = {
+          #     memory = "2Gi"
+          #   }
+          #   requests = {
+          #     cpu    = "200m"
+          #     memory = "400Mi"
+          #   }
+          # }
           env {
             name = "MY_POD_IP"
             value_from {
@@ -179,47 +179,16 @@ resource "kubernetes_deployment_v1" "otel_collector" {
             }
           }
           port {
-            container_port = 54526
-            name           = "syslogtcp"
-          }
-          port {
-            container_port = 54527
-            name           = "syslogudp"
-            protocol       = "UDP"
-          }
-          port {
-            container_port = 54528
-            name           = "syslogtcptls"
-          }
-          # Default endpoint for ZPages.
-          port {
-            container_port = 55679
-            name           = "zpages"
-          }
-          # Default endpoint for OpenTelemetry receiver.
-          port {
             container_port = 4317
-            name           = "otel-grpc"
+            name           = "grpc"
           }
-          # Default endpoint for Jaeger gRPC receiver.
           port {
-            container_port = 14250
-            name           = "jaeger-grpc"
+            container_port = 4318
+            name           = "http"
           }
-          # Default endpoint for Jaeger HTTP receiver.
           port {
-            container_port = 14268
-            name           = "jaeger-http"
-          }
-          # Default endpoint for Zipkin receiver.
-          port {
-            container_port = 9411
-            name           = "zipkin"
-          }
-          # Default endpoint for querying metrics.
-          port {
-            container_port = 8888
-            name           = "metrics"
+            container_port = 8889
+            name           = "prom-metrics"
           }
         }
 

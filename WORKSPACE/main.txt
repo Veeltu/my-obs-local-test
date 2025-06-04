@@ -99,39 +99,7 @@ resource "kubernetes_service_v1" "otel_collector" {
   }
 }
 
-# Ingress dla OpenTelemetry Collector metrics
-# resource "kubernetes_ingress_v1" "otel_collector_metrics" {
-#   metadata {
-#     name      = "otel-collector-metrics"
-#     namespace = kubernetes_namespace.network.metadata[0].name
-#   }
-#   spec {
-#     rule {
-#       host = "otel-metrics.local"
-#       http {
-#         path {
-#           path      = "/metrics"
-#           path_type = "Prefix"
-#           backend {
-#             service {
-#               name = kubernetes_service_v1.otel_collector.metadata[0].name
-#               port {
-#                 number = 8889
-#               }
-#             }
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
 
-# Namespace dla Prometheusa
-# resource "kubernetes_namespace" "monitoring" {
-#   metadata {
-#     name = "monitoring"
-#   }
-# }
 
 # ConfigMap Prometheusa z konfiguracją scrape
 resource "kubernetes_config_map_v1" "prometheus_config" {
