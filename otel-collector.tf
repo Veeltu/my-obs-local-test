@@ -111,11 +111,11 @@ resource "kubernetes_deployment_v1" "otel_collector" {
             sub_path   = "config.yaml"
             read_only  = true
           }
-          volume_mount {
-            name       = "secrets"
-            mount_path = "/etc/otelcol-contrib/secrets"
-            read_only  = true
-          }
+          # volume_mount {
+          #   name       = "secrets"
+          #   mount_path = "/etc/otelcol-contrib/secrets"
+          #   read_only  = true
+          # }
 
           resources {
             limits = {
