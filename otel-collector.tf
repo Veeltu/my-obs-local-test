@@ -16,7 +16,7 @@ resource "kubernetes_config_map_v1" "otel_collector_config" {
     "config.yaml" = file("otel-collector-config.yaml")
     # "config.yaml" = yamlencode(local.otel_config)
   }
-  depends_on = [kubernetes_namespace.network]
+  # depends_on = [kubernetes_namespace.network]
 }
 
 # Service exposing Collector ports
@@ -32,8 +32,9 @@ resource "kubernetes_service_v1" "otel_collector" {
   }
   spec {
     selector = {
-      app       = "opentelemetry"
-      component = "otel-collector"
+      app = "otel-collector"
+      # app       = "opentelemetry"
+      # component = "otel-collector"
     }
 
     port {
