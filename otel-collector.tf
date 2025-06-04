@@ -171,7 +171,7 @@ resource "kubernetes_deployment_v1" "otel_collector" {
               }
             }
           }
-          #           port {
+          # port {
           #   container_port = 54526
           #   name           = "syslogtcp"
           # }
@@ -258,5 +258,5 @@ resource "kubernetes_deployment_v1" "otel_collector" {
       }
     }
   }
-  # depends_on = [kubernetes_manifest.certs]
+  # depends_on = [kubernetes_manifest.certs] // after certs are created
 }

@@ -1,4 +1,3 @@
-# Ingress dla Prometheusa
 resource "kubernetes_ingress_v1" "prometheus_ui" {
   metadata {
     name      = "prometheus-ui"
@@ -32,6 +31,43 @@ resource "kubernetes_ingress_v1" "prometheus_ui" {
     # tls {
     #   hosts       = ["prometheus.local"]
     #   secret_name = "prometheus-tls-secret"
+    # }
+  }
+}
+
+
+resource "kubernetes_ingress_v1" "otel_ui" {
+  metadata {
+    name      = "otel-ui"
+    namespace = kubernetes_namespace.network.metadata[0].name
+    annotations = {
+      "kubernetes.io/ingress.class" = "public"
+      # "nginx.ingress.kubernetes.io/rewrite-target" = "/" # if you need rewrite path
+    }
+  }
+
+  spec {
+    rule {
+      host = "otel.local"
+      http {
+        path {
+          path      = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = kubernetes_service_v1.otel_collector.metadata[0].name
+              port {
+                number = 4318 # Port HTTP serwis
+              }
+            }
+          }
+        }
+      }
+    }
+
+    # tls {
+    #   hosts       = ["otel.local"]
+    #   secret_name = "otel-tls-secret"
     # }
   }
 }
