@@ -127,42 +127,42 @@ resource "kubernetes_deployment_v1" "otel_collector" {
           #     }
           #   }
           # }
-          # env {
-          #   name = "KAFKA_USERNAME"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "kafka-credentials"
-          #       key  = "username"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "kafka-credentials"
-          #       key  = "password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "SNMP_AUTH_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "snmp-credentials"
-          #       key  = "auth-password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "SNMP_PRIVACY_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "snmp-credentials"
-          #       key  = "privacy-password"
-          #     }
-          #   }
-          # }
+          env {
+            name = "KAFKA_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "kafka-credentials"
+                key  = "username"
+              }
+            }
+          }
+          env {
+            name = "KAFKA_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "kafka-credentials"
+                key  = "password"
+              }
+            }
+          }
+          env {
+            name = "SNMP_AUTH_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "snmp-credentials"
+                key  = "auth-password"
+              }
+            }
+          }
+          env {
+            name = "SNMP_PRIVACY_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "snmp-credentials"
+                key  = "privacy-password"
+              }
+            }
+          }
           # env {
           #   name = "K8S_NODE_NAME"
           #   value_from {
