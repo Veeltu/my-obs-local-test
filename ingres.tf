@@ -57,7 +57,7 @@ resource "kubernetes_ingress_v1" "otel_ui" {
             service {
               name = kubernetes_service_v1.otel_collector.metadata[0].name
               port {
-                number = 4318 # Port HTTP serwis
+                number = 8889 # Port HTTP serwis
               }
             }
           }
