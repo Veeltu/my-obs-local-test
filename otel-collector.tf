@@ -119,14 +119,14 @@ resource "kubernetes_deployment_v1" "otel_collector" {
               memory = "400Mi"
             }
           }
-          # env {
-          #   name = "MY_POD_IP"
-          #   value_from {
-          #     field_ref {
-          #       field_path = "status.podIP"
-          #     }
-          #   }
-          # }
+          env {
+            name = "MY_POD_IP"
+            value_from {
+              field_ref {
+                field_path = "status.podIP"
+              }
+            }
+          }
           env {
             name = "KAFKA_USERNAME"
             value_from {
@@ -163,14 +163,14 @@ resource "kubernetes_deployment_v1" "otel_collector" {
               }
             }
           }
-          # env {
-          #   name = "K8S_NODE_NAME"
-          #   value_from {
-          #     field_ref {
-          #       field_path = "spec.nodeName"
-          #     }
-          #   }
-          # }
+          env {
+            name = "K8S_NODE_NAME"
+            value_from {
+              field_ref {
+                field_path = "spec.nodeName"
+              }
+            }
+          }
           #           port {
           #   container_port = 54526
           #   name           = "syslogtcp"
