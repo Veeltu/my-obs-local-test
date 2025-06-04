@@ -86,9 +86,9 @@ resource "kubernetes_deployment_v1" "otel_collector" {
         component = "otel-collector"
       }
     }
-    min_ready_seconds         = 5
-    progress_deadline_seconds = 120
-    replicas                  = 1
+    min_ready_seconds = 5
+    # progress_deadline_seconds = 120
+    replicas = 1
     template {
       metadata {
         labels = {
