@@ -25,8 +25,9 @@ resource "kubernetes_service_v1" "otel_collector" {
     name      = "otel-collector"
     namespace = kubernetes_namespace.network.metadata[0].name
     labels = {
-      app       = "opentelemetry"
-      component = "otel-collector"
+      app = "otel-collector"
+      # app       = "opentelemetry"
+      # component = "otel-collector"
     }
   }
   spec {
@@ -222,7 +223,7 @@ resource "kubernetes_deployment_v1" "otel_collector" {
           }
           port {
             container_port = 8889
-            name           = "prom-metrics"
+            name           = "metrics"
           }
         }
         volume {
