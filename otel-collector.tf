@@ -48,8 +48,8 @@ resource "kubernetes_service_v1" "otel_collector" {
       name        = "otel-http"
     }
     port {
-      port        = 8888
-      target_port = 8888
+      port        = 8889
+      target_port = 8889
       protocol    = "TCP"
       name        = "metrics"
     }
@@ -59,124 +59,45 @@ resource "kubernetes_service_v1" "otel_collector" {
     #   protocol    = "TCP"
     #   name        = "zpages"
     # }
-    port {
-      port        = 54527
-      target_port = 54527
-      protocol    = "UDP"
-      name        = "syslogudp"
-    }
+    # port {
+    #   port        = 54527
+    #   target_port = 54527
+    #   protocol    = "UDP"
+    #   name        = "syslogudp"
+    # }
   }
 }
 
-# Deployment for the OpenTelemetry Collector
+# Deployment OpenTelemetry Collector
 resource "kubernetes_deployment_v1" "otel_collector" {
   metadata {
     name      = "otel-collector"
     namespace = kubernetes_namespace.network.metadata[0].name
     labels = {
-      app       = "opentelemetry"
-      component = "otel-collector"
+      app = "otel-collector"
     }
   }
-
   spec {
+    replicas = 1
     selector {
       match_labels = {
-        app       = "opentelemetry"
-        component = "otel-collector"
+        app = "otel-collector"
       }
     }
-    # min_ready_seconds = 5
-    # progress_deadline_seconds = 120
-    # replicas = 1
     template {
       metadata {
         labels = {
-          app       = "opentelemetry"
-          component = "otel-collector"
+          app = "otel-collector"
         }
       }
       spec {
-        service_account_name = kubernetes_service_account_v1.otel_collector.metadata[0].name
-
         container {
           name  = "otel-collector"
-          image = "otel/opentelemetry-collector-contrib:0.97.0"
-
-          args = ["--config=/etc/otelcol-contrib/config.yaml"]
-
+          image = "otel/opentelemetry-collector-contrib:latest"
+          args  = ["--config=/etc/otel/config.yaml"]
           volume_mount {
             name       = "otel-collector-config"
-            mount_path = "/etc/otelcol-contrib/config.yaml"
-            sub_path   = "config.yaml"
-            read_only  = true
-          }
-          # volume_mount {
-          #   name       = "secrets"
-          #   mount_path = "/etc/otelcol-contrib/secrets"
-          #   read_only  = true
-          # }
-
-          # resources {
-          #   limits = {
-          #     memory = "2Gi"
-          #   }
-          #   requests = {
-          #     cpu    = "200m"
-          #     memory = "400Mi"
-          #   }
-          # }
-          env {
-            name = "MY_POD_IP"
-            value_from {
-              field_ref {
-                field_path = "status.podIP"
-              }
-            }
-          }
-          env {
-            name = "KAFKA_USERNAME"
-            value_from {
-              secret_key_ref {
-                name = "kafka-credentials"
-                key  = "username"
-              }
-            }
-          }
-          env {
-            name = "KAFKA_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "kafka-credentials"
-                key  = "password"
-              }
-            }
-          }
-          env {
-            name = "SNMP_AUTH_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "snmp-credentials"
-                key  = "auth-password"
-              }
-            }
-          }
-          env {
-            name = "SNMP_PRIVACY_PASSWORD"
-            value_from {
-              secret_key_ref {
-                name = "snmp-credentials"
-                key  = "privacy-password"
-              }
-            }
-          }
-          env {
-            name = "K8S_NODE_NAME"
-            value_from {
-              field_ref {
-                field_path = "spec.nodeName"
-              }
-            }
+            mount_path = "/etc/otel"
           }
           port {
             container_port = 4317
@@ -191,37 +112,13 @@ resource "kubernetes_deployment_v1" "otel_collector" {
             name           = "prom-metrics"
           }
         }
-
         volume {
           name = "otel-collector-config"
           config_map {
             name = kubernetes_config_map_v1.otel_collector_config.metadata[0].name
           }
         }
-
-        # volume {
-        #   name = "secrets"
-        #   projected {
-        #     sources {
-        #       dynamic "secret" {
-        #         for_each = local.certs
-        #         content {
-        #           name = replace(secret.value, ".", "-")
-        #           items {
-        #             key  = "tls.crt"
-        #             path = "${replace(secret.value, ".", "-")}.crt"
-        #           }
-        #           items {
-        #             key  = "tls.key"
-        #             path = "${replace(secret.value, ".", "-")}.key"
-        #           }
-        #         }
-        #       }
-        #     }
-        #   }
-        # }
       }
     }
   }
-  # depends_on = [kubernetes_manifest.certs]
 }
