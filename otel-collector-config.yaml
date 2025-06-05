@@ -258,43 +258,46 @@ extensions:
 exporters:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/kafkaexporter/README.md
 
-  # kafka/traces:
-  #   brokers:
-  #     - otel-kafka-bootstrap.kafka-cluster:9094
-  #   protocol_version: 3.9.0
-  #   topic: otel-traces
-  #   #encoding: otlp_json # readable for debugging, default is pb
-  #   auth:
-  #     sasl:
-  #       username: ${env:KAFKA_USERNAME}
-  #       password: ${env:KAFKA_PASSWORD}
-  #       mechanism: SCRAM-SHA-512
-  #       version: 1
-  # kafka/metrics:
-  #   brokers:
-  #     - otel-kafka-bootstrap.kafka-cluster:9094
-  #   protocol_version: 3.9.0
-  #   topic: otel-metrics
-  #   #encoding: otlp_json # readable for debugging, default is pb
-  #   auth:
-  #     sasl:
-  #       username: ${env:KAFKA_USERNAME}
-  #       password: ${env:KAFKA_PASSWORD}
-  #       mechanism: SCRAM-SHA-512
-  #       version: 1
-  # kafka/logs:
-  #   brokers:
-  #     - otel-kafka-bootstrap.kafka-cluster:9094
-  #   protocol_version: 3.9.0
-  #   topic: otel-logs
-  #   #encoding: otlp_json # readable for debugging, default is pb
-  #   auth:
-  #     sasl:
-  #       username: ${env:KAFKA_USERNAME}
-  #       password: ${env:KAFKA_PASSWORD}
-  #       mechanism: SCRAM-SHA-512
-  #       version: 1
-  
+  kafka/traces:
+    brokers:
+      # - otel-kafka-bootstrap.kafka-cluster:9094
+      - kafka-external.test-kafka.svc.cluster.local:9094
+    protocol_version: 3.9.0
+    topic: otel-traces
+    #encoding: otlp_json # readable for debugging, default is pb
+    auth:
+      sasl:
+        username: ${env:KAFKA_USERNAME}
+        password: ${env:KAFKA_PASSWORD}
+        mechanism: SCRAM-SHA-512
+        version: 1
+  kafka/metrics:
+    brokers:
+      # - otel-kafka-bootstrap.kafka-cluster:9094
+      - kafka-external.test-kafka.svc.cluster.local:9094
+    protocol_version: 3.9.0
+    topic: otel-metrics
+    #encoding: otlp_json # readable for debugging, default is pb
+    auth:
+      sasl:
+        username: ${env:KAFKA_USERNAME}
+        password: ${env:KAFKA_PASSWORD}
+        mechanism: SCRAM-SHA-512
+        version: 1
+  kafka/logs:
+    brokers:
+      # - otel-kafka-bootstrap.kafka-cluster:9094
+      - kafka-external.test-kafka.svc.cluster.local:9094
+    protocol_version: 3.9.0
+    topic: otel-logs
+    #encoding: otlp_json # readable for debugging, default is pb
+    auth:
+      sasl:
+        username: ${env:KAFKA_USERNAME}
+        password: ${env:KAFKA_PASSWORD}
+        mechanism: SCRAM-SHA-512
+        version: 1
+
   # otlp/tempo:
   #   endpoint: "http://tempo.tempo:4317" 
   #   tls:
