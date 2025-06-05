@@ -259,7 +259,7 @@ exporters:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/kafkaexporter/README.md
   kafka/traces:
     brokers:
-      - otel-kafka-bootstrap.kafka-cluster:9094
+      # - otel-kafka-bootstrap.kafka-cluster:9094
     protocol_version: 3.9.0
     topic: otel-traces
     #encoding: otlp_json # readable for debugging, default is pb
@@ -271,7 +271,7 @@ exporters:
         version: 1
   kafka/metrics:
     brokers:
-      - otel-kafka-bootstrap.kafka-cluster:9094
+      # - otel-kafka-bootstrap.kafka-cluster:9094
     protocol_version: 3.9.0
     topic: otel-metrics
     #encoding: otlp_json # readable for debugging, default is pb
@@ -283,7 +283,7 @@ exporters:
         version: 1
   kafka/logs:
     brokers:
-      - otel-kafka-bootstrap.kafka-cluster:9094
+      # - otel-kafka-bootstrap.kafka-cluster:9094
     protocol_version: 3.9.0
     topic: otel-logs
     #encoding: otlp_json # readable for debugging, default is pb
