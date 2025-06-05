@@ -359,13 +359,13 @@ processors:
 #         exporters: [kafka/metrics]
 #         # exporters: [prometheus/vyos]
 
-  exporters:
-    debug: {}
-    prometheus:
-      endpoint: 0.0.0.0:8889
+exporters:
+  debug: {}
+  prometheus:
+    endpoint: 0.0.0.0:8889
 
-  service:
-    pipelines:
-      metrics:
-        receivers: [prometheus]
-        exporters: [debug, prometheus]
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      exporters: [debug, prometheus]
