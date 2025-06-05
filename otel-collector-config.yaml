@@ -1,14 +1,13 @@
+# https://opentelemetry.io/docs/collector/deployment/gateway/
+
 receivers:
-# OpenTelemetry Protocol 
   otlp:
     protocols:
       grpc:
         endpoint: ${env:MY_POD_IP}:4317
-        # endpoint: 0.0.0.0:4317
       http:
         endpoint: ${env:MY_POD_IP}:4318
-        # endpoint: 0.0.0.0:4318
-
+  
   # https://opentelemetry.io/docs/kubernetes/collector/components/
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/k8sclusterreceiver
   # **IMPORTANT NOTICE**:
@@ -33,8 +32,8 @@ receivers:
     enable_octet_counting: false
     allow_skip_pri_header: false
     location: UTC
-
-    # option for handling tls here
+  
+  # option for handling tls here
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/syslogreceiver/README.md
   syslog/rfc5424tls:
     tcp:
@@ -68,9 +67,16 @@ receivers:
     allow_skip_pri_header: false
     location: UTC
 
-  prometheus:
+  # Vyos SNMP
+  # https://confluence.bare.pandrosion.org/pages/viewpage.action?pageId=190612318#POCSyslogMessagingforObservability-ObservabilityMeasures
+  # debug
+  # k port-forward svc/prom-snmp-exporter 9116:9116
+  # curl 'http://localhost:9116/snmp?module=hrSystem&module=system&module=if_mib&target=er-2613e3531e2348a087063887378c2a0f.default-doe.stable.pndrs.de&auth=vyos'
+  # curl 'http://localhost:9116/snmp?module=vyos_system&target=er-2613e3531e2348a087063887378c2a0f.default-doe.stable.pndrs.de&auth=vyos'
+  prometheus/vyos:
     config:
       scrape_configs:
+        #local tests jobs
         - job_name: otel-frr-exporter
           static_configs:
             - targets:
@@ -90,13 +96,260 @@ receivers:
           metrics_path: /metrics
           scrape_interval: 5s
 
+        # Global exporter-level metrics
+        - job_name: snmp_exporter
+          static_configs:
+            - targets: ['prom-snmp-exporter:9116']
+        - job_name: snmp
+          static_configs:
+            - targets:
+                - er-2613e3531e2348a087063887378c2a0f.default-doe.stable.pndrs.de
+                - er-2516c83242e043ea93c56fc04589075f.doe.stable.pndrs.de
+                - er-39a82c2460804a0c99868ce5ca779300.zerocarbon-1.stable.pndrs.de
+          metrics_path: /snmp
+          params:
+            auth:
+              - vyos
+            # we may still need to filter these
+            module:
+              # SNMPv2-MIB
+              # https://mibbrowser.online/mibdb_search.php?mib=SNMPv2-MIB
+              # https://github.com/prometheus/snmp_exporter/blob/16185db0f330e5e6eadf8cd83741cde80320edfe/snmp.yml#L42025
+              - system
+
+              # IF-MIB
+              # https://mibbrowser.online/mibdb_search.php?mib=IF-MIB
+              # https://github.com/prometheus/snmp_exporter/blob/16185db0f330e5e6eadf8cd83741cde80320edfe/snmp.yml#L22378
+              - if_mib
+
+              # HOST-RESOURCES-MIB
+              # https://mibbrowser.online/mibdb_search.php?mib=HOST-RESOURCES-MIB
+              # https://github.com/prometheus/snmp_exporter/blob/16185db0f330e5e6eadf8cd83741cde80320edfe/snmp.yml#L22342
+              - hrSystem
+              - hrSWRunPerf
+              - hrStorage
+              - hrSWRun
+              
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+            - target_label: __address__
+              replacement: prom-snmp-exporter:9116  # The SNMP exporter's real hostname:port.
+
+              # add vyos exporters
+        - job_name: frr_exporter
+          static_configs:
+            - targets:
+                - er-2613e3531e2348a087063887378c2a0f.default-doe.stable.pndrs.de
+                - er-2516c83242e043ea93c56fc04589075f.doe.stable.pndrs.de
+                - er-39a82c2460804a0c99868ce5ca779300.zerocarbon-1.stable.pndrs.de
+          metrics_path: /metrics
+          relabel_configs:
+            # 1. add port 9342 to targets
+            - source_labels: [__address__]
+              regex: (.*) # traget all
+              replacement: $1:9342 # add port
+              target_label: __address__ # replace address
+
+            # 2. set instance without port
+            - source_labels: [__address__] # get address with port
+              regex: (.*):9342 # match address with port
+              target_label: instance # set instance
+              replacement: $1 # replace with address without port
+
+        - job_name: blackbox_exporter
+          static_configs:
+            - targets:
+                - er-2613e3531e2348a087063887378c2a0f.default-doe.stable.pndrs.de
+                - er-2516c83242e043ea93c56fc04589075f.doe.stable.pndrs.de
+                - er-39a82c2460804a0c99868ce5ca779300.zerocarbon-1.stable.pndrs.de
+          metrics_path: /metrics
+          relabel_configs:
+            # 1. add port 9115 to targets
+            - source_labels: [__address__]
+              regex: (.*) # traget all
+              replacement: $1:9115 # add port
+              target_label: __address__ # replace address
+
+            # 2. set instance without port
+            - source_labels: [__address__] # get address with port
+              regex: (.*):9115 # match address with port
+              target_label: instance # set instance
+              replacement: $1 # replace with address without port
+
+        - job_name: node_exporter
+          static_configs:
+            - targets:
+                - er-2613e3531e2348a087063887378c2a0f.default-doe.stable.pndrs.de
+                - er-2516c83242e043ea93c56fc04589075f.doe.stable.pndrs.de
+                - er-39a82c2460804a0c99868ce5ca779300.zerocarbon-1.stable.pndrs.de
+          metrics_path: /metrics
+          relabel_configs:
+            # 1. add port 9481 to targets
+            - source_labels: [__address__]
+              regex: (.*) # traget all
+              replacement: $1:9481 # add port
+              target_label: __address__ # replace address
+
+            # 2. set instance without port
+            - source_labels: [__address__] # get address with port
+              regex: (.*):9481 # match address with port
+              target_label: instance # set instance
+              replacement: $1 # replace with address without port
+
+
+
+processors:
+  batch:
+  memory_limiter:
+    # 80% of maximum memory up to 2G
+    limit_mib: 1500
+    # 25% of limit up to 2G
+    spike_limit_mib: 512
+    check_interval: 5s
+  k8sattributes:
+    auth_type: 'serviceAccount'
+    extract:
+      metadata: # extracted from the pod
+        - k8s.namespace.name
+        - k8s.pod.name
+        - k8s.pod.start_time
+        - k8s.pod.uid
+        - k8s.deployment.name
+        - k8s.node.name
+      # annotations:
+      #   # Extracts the value of a pod annotation with key `annotation-one` and inserts it as a resource attribute with key `a1`
+      #   - tag_name: a1
+      #     key: annotation-one
+      #     from: pod
+      #   # Extracts the value of a namespaces annotation with key `annotation-two` with regexp and inserts it as a resource  with key `a2`
+      #   - tag_name: a2
+      #     key: annotation-two
+      #     regex: field=(?P<value>.+)
+      #     from: namespace
+      # labels:
+      #   # Extracts the value of a namespaces label with key `label1` and inserts it as a resource attribute with key `l1`
+      #   - tag_name: l1
+      #     key: label1
+      #     from: namespace
+      #   # Extracts the value of a pod label with key `label2` with regexp and inserts it as a resource attribute with key `l2`
+      #   - tag_name: l2
+      #     key: label2
+      #     regex: field=(?P<value>.+)
+      #     from: pod
+    pod_association: # How to associate the data to a pod (order matters)
+      - sources: # First try to use the value of the resource attribute k8s.pod.ip
+          - from: resource_attribute
+            name: k8s.pod.ip
+      - sources: # Then try to use the value of the resource attribute k8s.pod.uid
+          - from: resource_attribute
+            name: k8s.pod.uid
+      - sources: # If neither of those work, use the request's connection to get the pod IP.
+          - from: connection
+
+
+
+extensions:
+  #zpages: {}
+
+
 exporters:
-  debug: {}
-  prometheus:
-    endpoint: 0.0.0.0:8889
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/kafkaexporter/README.md
+  kafka/traces:
+    brokers:
+      - otel-kafka-bootstrap.kafka-cluster:9094
+    protocol_version: 3.9.0
+    topic: otel-traces
+    #encoding: otlp_json # readable for debugging, default is pb
+    auth:
+      sasl:
+        username: ${env:KAFKA_USERNAME}
+        password: ${env:KAFKA_PASSWORD}
+        mechanism: SCRAM-SHA-512
+        version: 1
+  kafka/metrics:
+    brokers:
+      - otel-kafka-bootstrap.kafka-cluster:9094
+    protocol_version: 3.9.0
+    topic: otel-metrics
+    #encoding: otlp_json # readable for debugging, default is pb
+    auth:
+      sasl:
+        username: ${env:KAFKA_USERNAME}
+        password: ${env:KAFKA_PASSWORD}
+        mechanism: SCRAM-SHA-512
+        version: 1
+  kafka/logs:
+    brokers:
+      - otel-kafka-bootstrap.kafka-cluster:9094
+    protocol_version: 3.9.0
+    topic: otel-logs
+    #encoding: otlp_json # readable for debugging, default is pb
+    auth:
+      sasl:
+        username: ${env:KAFKA_USERNAME}
+        password: ${env:KAFKA_PASSWORD}
+        mechanism: SCRAM-SHA-512
+        version: 1
+  # otlp/tempo:
+  #   endpoint: "http://tempo.tempo:4317" 
+  #   tls:
+  #     insecure: true
+  # otlphttp/tempo:
+  #   endpoint: "http://tempo.tempo:4318" 
+    
+  # # https://grafana.com/docs/loki/latest/send-data/otel/
+  # otlphttp/loki:
+  #   endpoint: http://loki.loki:3100/otlp
+  
+  # # https://prometheus.io/docs/guides/opentelemetry/
+  # # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/otlphttpexporter/README.md
+  # otlphttp/prometheus:
+  #   endpoint: http://prometheus-server.prometheus:80/api/v1/otlp
+  #   encoding: proto
+  #   # we only have metrics
+  #   metrics_endpoint: http://prometheus-server.prometheus:80/api/v1/otlp/v1/metrics
+  #   # TBD: not sure, but didnt find a way to turn off
+  #   traces_endpoint: none
+  #   logs_endpoint: none
+
+    
+
+  # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/debugexporter/README.md
+  debug: 
+    verbosity: basic # basic/detailed 
 
 service:
-  pipelines:
+  #extensions: [zpages]
+  pipelines: 
+    metrics/k8s_cluster:
+      receivers: [k8s_cluster]
+      exporters: [kafka/metrics]
+    
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [kafka/traces, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [kafka/logs, debug]
+      
     metrics:
-      receivers: [prometheus]
-      exporters: [debug, prometheus]
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [kafka/metrics]
+
+    logs/syslog-test:
+      receivers: [syslog/rfc5424, syslog/rfc5424tls]
+      #processors: [memory_limiter, batch]
+      exporters: [kafka/logs, debug]
+
+    metrics/vyos:
+        receivers: [prometheus/vyos]
+        processors: [memory_limiter, batch]
+        # exporters: [kafka/metrics]
+        exporters: [prometheus/vyos]
