@@ -39,8 +39,8 @@ receivers:
     tcp:
       listen_address: ${env:MY_POD_IP}:54528
       tls:
-        cert_file: /etc/otelcol-contrib/secrets/gw-observability-test-pndrs-de.crt
-        key_file: /etc/otelcol-contrib/secrets/gw-observability-test-pndrs-de.key
+        # cert_file: /etc/otelcol-contrib/secrets/gw-observability-test-pndrs-de.crt
+        # key_file: /etc/otelcol-contrib/secrets/gw-observability-test-pndrs-de.key
         #ca_file:
         #client_ca_file:
     protocol: rfc5424
