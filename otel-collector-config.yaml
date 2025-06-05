@@ -255,48 +255,48 @@ extensions:
   #zpages: {}
 
 
-exporters:
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/kafkaexporter/README.md
+# exporters:
+#   # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/kafkaexporter/README.md
 
-  kafka/traces:
-    brokers:
-      # - otel-kafka-bootstrap.kafka-cluster:9094
-      - kafka-external.test-kafka.svc.cluster.local:9094
-    protocol_version: 3.9.0
-    topic: otel-traces
-    #encoding: otlp_json # readable for debugging, default is pb
-    auth:
-      sasl:
-        username: ${env:KAFKA_USERNAME}
-        password: ${env:KAFKA_PASSWORD}
-        mechanism: SCRAM-SHA-512
-        version: 1
-  kafka/metrics:
-    brokers:
-      # - otel-kafka-bootstrap.kafka-cluster:9094
-      - kafka-external.test-kafka.svc.cluster.local:9094
-    protocol_version: 3.9.0
-    topic: otel-metrics
-    #encoding: otlp_json # readable for debugging, default is pb
-    auth:
-      sasl:
-        username: ${env:KAFKA_USERNAME}
-        password: ${env:KAFKA_PASSWORD}
-        mechanism: SCRAM-SHA-512
-        version: 1
-  kafka/logs:
-    brokers:
-      # - otel-kafka-bootstrap.kafka-cluster:9094
-      - kafka-external.test-kafka.svc.cluster.local:9094
-    protocol_version: 3.9.0
-    topic: otel-logs
-    #encoding: otlp_json # readable for debugging, default is pb
-    auth:
-      sasl:
-        username: ${env:KAFKA_USERNAME}
-        password: ${env:KAFKA_PASSWORD}
-        mechanism: SCRAM-SHA-512
-        version: 1
+#   kafka/traces:
+#     brokers:
+#       # - otel-kafka-bootstrap.kafka-cluster:9094
+#       - kafka-external.test-kafka.svc.cluster.local:9094
+#     protocol_version: 3.9.0
+#     topic: otel-traces
+#     #encoding: otlp_json # readable for debugging, default is pb
+#     auth:
+#       sasl:
+#         username: ${env:KAFKA_USERNAME}
+#         password: ${env:KAFKA_PASSWORD}
+#         mechanism: SCRAM-SHA-512
+#         version: 1
+#   kafka/metrics:
+#     brokers:
+#       # - otel-kafka-bootstrap.kafka-cluster:9094
+#       - kafka-external.test-kafka.svc.cluster.local:9094
+#     protocol_version: 3.9.0
+#     topic: otel-metrics
+#     #encoding: otlp_json # readable for debugging, default is pb
+#     auth:
+#       sasl:
+#         username: ${env:KAFKA_USERNAME}
+#         password: ${env:KAFKA_PASSWORD}
+#         mechanism: SCRAM-SHA-512
+#         version: 1
+#   kafka/logs:
+#     brokers:
+#       # - otel-kafka-bootstrap.kafka-cluster:9094
+#       - kafka-external.test-kafka.svc.cluster.local:9094
+#     protocol_version: 3.9.0
+#     topic: otel-logs
+#     #encoding: otlp_json # readable for debugging, default is pb
+#     auth:
+#       sasl:
+#         username: ${env:KAFKA_USERNAME}
+#         password: ${env:KAFKA_PASSWORD}
+#         mechanism: SCRAM-SHA-512
+#         version: 1
 
   # otlp/tempo:
   #   endpoint: "http://tempo.tempo:4317" 
@@ -323,38 +323,49 @@ exporters:
     
 
   # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/debugexporter/README.md
-  debug: 
-    verbosity: basic # basic/detailed 
+  # debug: 
+  #   verbosity: basic # basic/detailed 
 
-service:
-  #extensions: [zpages]
-  pipelines: 
-    metrics/k8s_cluster:
-      receivers: [k8s_cluster]
-      exporters: [kafka/metrics]
+# service:
+#   #extensions: [zpages]
+#   pipelines: 
+#     metrics/k8s_cluster:
+#       receivers: [k8s_cluster]
+#       exporters: [kafka/metrics]
     
-    traces:
-      receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [kafka/traces, debug]
+#     traces:
+#       receivers: [otlp]
+#       processors: [memory_limiter, batch]
+#       exporters: [kafka/traces, debug]
 
-    logs:
-      receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [kafka/logs, debug]
+#     logs:
+#       receivers: [otlp]
+#       processors: [memory_limiter, batch]
+#       exporters: [kafka/logs, debug]
       
-    metrics:
-      receivers: [otlp]
-      processors: [memory_limiter, batch]
-      exporters: [kafka/metrics]
+#     metrics:
+#       receivers: [otlp]
+#       processors: [memory_limiter, batch]
+#       exporters: [kafka/metrics]
 
-    logs/syslog-test:
-      receivers: [syslog/rfc5424, syslog/rfc5424tls]
-      #processors: [memory_limiter, batch]
-      exporters: [kafka/logs, debug]
+#     logs/syslog-test:
+#       receivers: [syslog/rfc5424, syslog/rfc5424tls]
+#       #processors: [memory_limiter, batch]
+#       exporters: [kafka/logs, debug]
 
-    metrics/vyos:
-        receivers: [prometheus/vyos]
-        processors: [memory_limiter, batch]
-        exporters: [kafka/metrics]
-        # exporters: [prometheus/vyos]
+#     metrics/vyos:
+#         receivers: [prometheus/vyos]
+#         processors: [memory_limiter, batch]
+#         exporters: [kafka/metrics]
+#         # exporters: [prometheus/vyos]
+
+  exporters:
+    debug: {}
+    prometheus:
+      endpoint: 0.0.0.0:8889
+
+  service:
+    pipelines:
+      metrics:
+        receivers: [prometheus]
+        exporters: [debug, prometheus]
