@@ -250,6 +250,16 @@ processors:
           - from: connection
 
 
+exporters:
+  debug: {}
+  prometheus:
+    endpoint: 0.0.0.0:8889
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      exporters: [debug, prometheus]
+
 
 # extensions:
   #zpages: {}
@@ -359,13 +369,3 @@ processors:
 #         exporters: [kafka/metrics]
 #         # exporters: [prometheus/vyos]
 
-exporters:
-  debug: {}
-  prometheus:
-    endpoint: 0.0.0.0:8889
-
-service:
-  pipelines:
-    metrics:
-      receivers: [prometheus]
-      exporters: [debug, prometheus]
