@@ -257,8 +257,8 @@ exporters:
 service:
   pipelines:
     metrics:
-      receivers: [prometheus]
-      exporters: [debug, prometheus]
+      receivers: [prometheus/vyos]
+      exporters: [debug, prometheus/vyos]
 
 
 # extensions:
