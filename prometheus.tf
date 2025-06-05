@@ -2,7 +2,7 @@
 resource "kubernetes_config_map_v1" "prometheus_config" {
   metadata {
     name      = "prometheus-config"
-    namespace = kubernetes_namespace.my-network2.metadata[0].name
+    namespace = kubernetes_namespace.my-network3.metadata[0].name
   }
   data = {
     "prometheus.yml" = yamlencode({
@@ -15,7 +15,7 @@ resource "kubernetes_config_map_v1" "prometheus_config" {
           metrics_path = "/metrics"
           static_configs = [
             {
-              targets = ["otel-collector.my-network2.svc.cluster.local:8889"]
+              targets = ["otel-collector.my-network3.svc.cluster.local:8889"]
             }
           ]
         }
@@ -28,7 +28,7 @@ resource "kubernetes_config_map_v1" "prometheus_config" {
 resource "kubernetes_deployment_v1" "prometheus" {
   metadata {
     name      = "prometheus"
-    namespace = kubernetes_namespace.my-network2.metadata[0].name
+    namespace = kubernetes_namespace.my-network3.metadata[0].name
     labels = {
       app = "prometheus"
     }
@@ -88,7 +88,7 @@ resource "kubernetes_deployment_v1" "prometheus" {
 resource "kubernetes_service_v1" "prometheus" {
   metadata {
     name      = "prometheus"
-    namespace = kubernetes_namespace.my-network2.metadata[0].name
+    namespace = kubernetes_namespace.my-network3.metadata[0].name
   }
   spec {
     selector = {
