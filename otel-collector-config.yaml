@@ -251,7 +251,7 @@ processors:
 
 
 
-extensions:
+# extensions:
   #zpages: {}
 
 
