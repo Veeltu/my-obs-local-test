@@ -119,58 +119,58 @@ resource "kubernetes_deployment_v1" "otel_collector" {
               memory = "400Mi"
             }
           }
-          # env {
-          #   name = "MY_POD_IP"
-          #   value_from {
-          #     field_ref {
-          #       field_path = "status.podIP"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_USERNAME"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "kafka-credentials"
-          #       key  = "username"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "KAFKA_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "kafka-credentials"
-          #       key  = "password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "SNMP_AUTH_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "snmp-credentials"
-          #       key  = "auth-password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "SNMP_PRIVACY_PASSWORD"
-          #   value_from {
-          #     secret_key_ref {
-          #       name = "snmp-credentials"
-          #       key  = "privacy-password"
-          #     }
-          #   }
-          # }
-          # env {
-          #   name = "K8S_NODE_NAME"
-          #   value_from {
-          #     field_ref {
-          #       field_path = "spec.nodeName"
-          #     }
-          #   }
-          # }
+          env {
+            name = "MY_POD_IP"
+            value_from {
+              field_ref {
+                field_path = "status.podIP"
+              }
+            }
+          }
+          env {
+            name = "KAFKA_USERNAME"
+            value_from {
+              secret_key_ref {
+                name = "kafka-credentials"
+                key  = "username"
+              }
+            }
+          }
+          env {
+            name = "KAFKA_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "kafka-credentials"
+                key  = "password"
+              }
+            }
+          }
+          env {
+            name = "SNMP_AUTH_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "snmp-credentials"
+                key  = "auth-password"
+              }
+            }
+          }
+          env {
+            name = "SNMP_PRIVACY_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "snmp-credentials"
+                key  = "privacy-password"
+              }
+            }
+          }
+          env {
+            name = "K8S_NODE_NAME"
+            value_from {
+              field_ref {
+                field_path = "spec.nodeName"
+              }
+            }
+          }
           # port {
           #   container_port = 54526
           #   name           = "syslogtcp"
