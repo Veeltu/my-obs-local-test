@@ -2,7 +2,7 @@
 resource "kubernetes_service_account_v1" "otel_collector" {
   metadata {
     name      = "otel-collector"
-    namespace = kubernetes_namespace.network.metadata[0].name
+    namespace = kubernetes_namespace.my-network.metadata[0].name
   }
 }
 
@@ -10,20 +10,20 @@ resource "kubernetes_service_account_v1" "otel_collector" {
 resource "kubernetes_config_map_v1" "otel_collector_config" {
   metadata {
     name      = "otel-collector-config"
-    namespace = kubernetes_namespace.network.metadata[0].name
+    namespace = kubernetes_namespace.my-network.metadata[0].name
   }
   data = {
     "config.yaml" = file("otel-collector-config.yaml")
     # "config.yaml" = yamlencode(local.otel_config)
   }
-  # depends_on = [kubernetes_namespace.network]
+  # depends_on = [kubernetes_namespace.my-network]
 }
 
 # Service exposing Collector ports
 resource "kubernetes_service_v1" "otel_collector" {
   metadata {
     name      = "otel-collector"
-    namespace = kubernetes_namespace.network.metadata[0].name
+    namespace = kubernetes_namespace.my-network.metadata[0].name
     labels = {
       app = "otel-collector"
       # app       = "opentelemetry"
@@ -74,7 +74,7 @@ resource "kubernetes_service_v1" "otel_collector" {
 resource "kubernetes_deployment_v1" "otel_collector" {
   metadata {
     name      = "otel-collector"
-    namespace = kubernetes_namespace.network.metadata[0].name
+    namespace = kubernetes_namespace.my-network.metadata[0].name
     labels = {
       app = "otel-collector"
     }

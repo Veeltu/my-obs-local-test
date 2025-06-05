@@ -1,7 +1,7 @@
 resource "kubernetes_ingress_v1" "prometheus_ui" {
   metadata {
     name      = "prometheus-ui"
-    namespace = kubernetes_namespace.network.metadata[0].name
+    namespace = kubernetes_namespace.my-network.metadata[0].name
     annotations = {
       "kubernetes.io/ingress.class" = "public" # MikroK8s using "public", not "nginx"!
       # "nginx.ingress.kubernetes.io/rewrite-target" = "/"
@@ -39,7 +39,7 @@ resource "kubernetes_ingress_v1" "prometheus_ui" {
 resource "kubernetes_ingress_v1" "otel_ui" {
   metadata {
     name      = "otel-ui"
-    namespace = kubernetes_namespace.network.metadata[0].name
+    namespace = kubernetes_namespace.my-network.metadata[0].name
     annotations = {
       "kubernetes.io/ingress.class" = "public"
       # "nginx.ingress.kubernetes.io/rewrite-target" = "/" # if you need rewrite path
