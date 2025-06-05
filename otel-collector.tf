@@ -216,11 +216,11 @@ resource "kubernetes_deployment_v1" "otel_collector" {
           # }
           port {
             container_port = 4317
-            name           = "grpc"
+            name           = "otel-grpc"
           }
           port {
             container_port = 4318
-            name           = "http"
+            name           = "otel-http"
           }
           port {
             container_port = 8889
