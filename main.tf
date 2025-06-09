@@ -1,7 +1,7 @@
 # Namespace for all monitoring resources
-resource "kubernetes_namespace" "my-network3" {
+resource "kubernetes_namespace" "my-network" {
   metadata {
-    name = "my-network3"
+    name = "my-network"
     annotations = {
       "sidecar.opentelemetry.io/inject" = "true"
     }
