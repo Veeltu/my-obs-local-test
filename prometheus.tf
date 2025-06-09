@@ -2,7 +2,7 @@
 resource "kubernetes_config_map_v1" "prometheus_config" {
   metadata {
     name      = "prometheus-config"
-    namespace = kubernetes_namespace.my-network.metadata[0].name
+    namespace = kubernetes_namespace.my_network.metadata[0].name
   }
   data = {
     "prometheus.yml" = yamlencode({
@@ -28,7 +28,7 @@ resource "kubernetes_config_map_v1" "prometheus_config" {
 resource "kubernetes_deployment_v1" "prometheus" {
   metadata {
     name      = "prometheus"
-    namespace = kubernetes_namespace.my-network.metadata[0].name
+    namespace = kubernetes_namespace.my_network.metadata[0].name
     labels = {
       app = "prometheus"
     }
@@ -88,7 +88,7 @@ resource "kubernetes_deployment_v1" "prometheus" {
 resource "kubernetes_service_v1" "prometheus" {
   metadata {
     name      = "prometheus"
-    namespace = kubernetes_namespace.my-network.metadata[0].name
+    namespace = kubernetes_namespace.my_network.metadata[0].name
   }
   spec {
     selector = {
