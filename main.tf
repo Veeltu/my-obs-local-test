@@ -1,5 +1,5 @@
 # Namespace for all monitoring resources
-resource "kubernetes_namespace" "my-network" {
+resource "kubernetes_namespace" "my_network" {
   metadata {
     name = "my-network"
     annotations = {
